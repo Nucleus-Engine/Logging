@@ -32,10 +32,10 @@ int main() {
 
     std::vector<std::thread> _threads;
     const std::string messageTemplate = "Logging On Thread: ";
-    for (size_t idx = 0U; idx < 1'000U; ++idx)
+    for (uint32_t idx = 0U; idx < 1'000U; ++idx)
     {
         char message[30] = "";
-        sprintf(message, "%s%lu", messageTemplate.c_str(), idx);
+        sprintf(message, "%s%u", messageTemplate.c_str(), idx);
         _threads.emplace_back(std::thread(task, message, randi(0, 100)));
     }
 
