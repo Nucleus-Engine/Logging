@@ -1,0 +1,1 @@
+option('log_level', type: 'combo', choices: ['DEBUG', 'INFO', 'WARN', 'ERROR'], value: 'INFO', description: 'Default log level for the logger')

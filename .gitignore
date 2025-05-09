@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+# Build folders
+bld
+build
+
+# IDE-specific folders
+.vscode
+
+# Logs
+*.log
