@@ -1,7 +1,7 @@
 #include "Logger.h"
 #include "ConsoleSink.h"
 #include "RotatingFileSink.h"
-#include <threads.h>
+#include <thread>
 #include <string.h>
 #include <math.h>
 
