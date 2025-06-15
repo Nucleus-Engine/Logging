@@ -37,6 +37,6 @@ std::string RotatingFileSink::getTimestampedFilename() const {
 void RotatingFileSink::write(const std::string& message) {
     std::lock_guard<std::mutex> lock(mutex_);
     if (file_.is_open()) {
-        file_ << message << std::endl;
+        file_ << message;
     }
 }

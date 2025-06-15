@@ -17,10 +17,11 @@ public:
     void log(LogLevel level, const std::string& message);
     void addSink(std::shared_ptr<LogSink> sink);
     void setLogLevel(LogLevel level);
-    ~Logger();
+    void shutdown();
 
 private:
     Logger();
+    ~Logger();
     void worker();
 
     std::vector<std::shared_ptr<LogSink>> sinks_;

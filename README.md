@@ -1,7 +1,9 @@
 # Logging
+
 Generic logging library designed for use in the Nucleus Engine
 
 # Running Example
+
 This example has one log message at the INFO level and 1,000 log messages at the ERROR level.
 If you build at the WARN level, the INFO level message (which will be the first log message)
 will not display, but the 1,000 logs at the ERROR level will display. Each of the ERROR messages
@@ -11,6 +13,7 @@ an integer number of milliseconds between 0 and 100 when the thread spawns befor
 the log to the log queue.
 
 Cmake:
+
 ```
 mkdir bld
 cd bld
@@ -20,8 +23,10 @@ make -j8
 ```
 
 Meson
+
 ```
 meson setup build -Dlog_level=WARN
 meson compile -C build
-./build/examples/logger_example
+cd build
+./examples/logger_example
 ```

@@ -7,11 +7,6 @@ Logger::Logger() : running_(true), level_(DEFAULT_LOG_LEVEL) {
 }
 
 Logger::~Logger() {
-    running_ = false;
-    cv_.notify_all();
-    if (workerThread_.joinable()) {
-        workerThread_.join();
-    }
 }
 
 Logger& Logger::instance() {
@@ -29,7 +24,7 @@ void Logger::addSink(std::shared_ptr<LogSink> sink) {
 }
 
 void Logger::log(LogLevel level, const std::string& message) {
-    if (level < level_) return;
+    if (!running_ || level < level_) return;
     {
         std::lock_guard<std::mutex> lock(queueMutex_);
         queue_.emplace(level, message);
@@ -38,7 +33,7 @@ void Logger::log(LogLevel level, const std::string& message) {
 }
 
 void Logger::worker() {
-    while (running_) {
+    while (running_ || !queue_.empty()) {
         std::unique_lock<std::mutex> lock(queueMutex_);
         cv_.wait(lock, [&]() { return !queue_.empty() || !running_; });
 
@@ -63,7 +58,7 @@ void Logger::worker() {
                     case LogLevel::FATAL: ss << "[FATAL] "; break;
                 }
 
-                ss << msg.text;
+                ss << msg.text << "\n";
                 std::string formatted = ss.str();
 
                 for (auto& sink : sinks_) {
@@ -73,5 +68,13 @@ void Logger::worker() {
 
             lock.lock();
         }
+    }
+}
+
+void Logger::shutdown() {
+    cv_.notify_all();
+    if (running_) {
+        running_ = false;
+        workerThread_.join();
     }
 }
