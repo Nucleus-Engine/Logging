@@ -1,13 +1,14 @@
 #ifndef NUCLEUS_CONSOLE_SINK_H
 #define NUCLEUS_CONSOLE_SINK_H
 
+#include "Common.h"
 #include "LogSink.h"
 #include <iostream>
 #include <mutex>
 
 class ConsoleSink : public LogSink {
 public:
-    void write(const std::string& message) override;
+    DllExport void write(const std::string& message) override;
 
 private:
     std::mutex mutex_;

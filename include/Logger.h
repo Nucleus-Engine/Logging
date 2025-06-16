@@ -1,6 +1,7 @@
 #ifndef NUCLEUS_LOGGING_H
 #define NUCLEUS_LOGGING_H
 
+#include "Common.h"
 #include "LogSink.h"
 #include "LogMessage.h"
 #include <vector>
@@ -10,14 +11,13 @@
 #include <thread>
 #include <memory>
 #include <atomic>
-
 class Logger {
 public:
-    static Logger& instance();
-    void log(LogLevel level, const std::string& message);
-    void addSink(std::shared_ptr<LogSink> sink);
-    void setLogLevel(LogLevel level);
-    void shutdown();
+    DllExport static Logger& instance();
+    DllExport void log(LogLevel level, const std::string& message);
+    DllExport void addSink(std::shared_ptr<LogSink> sink);
+    DllExport void setLogLevel(LogLevel level);
+    DllExport void shutdown();
 
 private:
     Logger();

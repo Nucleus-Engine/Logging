@@ -1,8 +1,9 @@
 #ifndef NUCLEUS_LOG_LEVEL_H
 #define NUCLEUS_LOG_LEVEL_H
 
+#include "Common.h"
 
-enum class LogLevel {
+enum class DllExport LogLevel {
     DEBUG = 0,
     INFO,
     WARN,

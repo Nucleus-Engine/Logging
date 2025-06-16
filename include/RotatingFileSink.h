@@ -8,8 +8,8 @@
 
 class RotatingFileSink : public LogSink {
 public:
-    explicit RotatingFileSink(const std::string& baseFilename);
-    void write(const std::string& message) override;
+    DllExport explicit RotatingFileSink(const std::string& baseFilename);
+    DllExport void write(const std::string& message) override;
 
 private:
     void rotateIfNeeded();
