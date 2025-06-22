@@ -1,0 +1,11 @@
+@startuml ConsoleSink_Diagram
+
+!include LogSink.puml
+
+class ConsoleSink
+{
+    +write(message : const std::string&) : void
+}
+
+ConsoleSink <|.... LogSink
+@enduml

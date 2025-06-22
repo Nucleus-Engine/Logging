@@ -1,0 +1,8 @@
+@startuml LogSink_Diagram
+
+abstract class LogSink {
+    +{abstract}write(message : const std::string&) : void
+    +{abstract}~LogSink()
+}
+
+@enduml
