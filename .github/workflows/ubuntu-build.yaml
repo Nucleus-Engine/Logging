@@ -9,6 +9,13 @@ on:
 jobs:
   build-and-verify:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: default
+            configure_args: ""
+          - name: trace
+            configure_args: "-Dlog_level=TRACE"
 
     steps:
       - name: Checkout repository
@@ -19,26 +26,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y meson ninja-build g++ python3
 
-      - name: Configure project with Meson
-        # Adjust log_level here if you want a non-default build config,
-        # e.g. -Dlog_level=ERROR
-        run: meson setup build
+      - name: Configure project with Meson (${{ matrix.name }})
+        run: meson setup build-${{ matrix.name }} ${{ matrix.configure_args }}
 
-      - name: Build project
-        run: meson compile -C build
+      - name: Build project (${{ matrix.name }})
+        run: meson compile -C build-${{ matrix.name }}
 
-      - name: Run the example
-        # Assumes the compiled executable lands at build/examples/logger_example
-        # (i.e. examples/meson.build's executable() is named 'logger_example').
-        # Adjust the path if your build output directory differs.
-        working-directory: build/examples
+      - name: Run the example (${{ matrix.name }})
+        working-directory: build-${{ matrix.name }}/examples
         run: ./logger_example
 
-      - name: Locate output.log
-        # ErrorLogger writes output.log relative to the process's working
-        # directory (build/examples, per the run step above). Copy it to the
-        # repo root so the verification script's default LOG_PATH finds it.
-        run: cp build/examples/output.log output.log
+      - name: Move output.log to repo root (${{ matrix.name }})
+        run: mv build-${{ matrix.name }}/examples/output.log output-${{ matrix.name }}.log
 
-      - name: Run verification script
-        run: python3 scripts/example_verification.py
+      - name: Run verification script (${{ matrix.name }})
+        run: python3 scripts/example_verification.py output-${{ matrix.name }}.log
