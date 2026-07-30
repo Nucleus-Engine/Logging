@@ -19,7 +19,12 @@ void task(std::string message, int delay)
     ERROR(message);
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    if (argc > 1)
+    {
+        ErrorLogger::setFilename(argv[1]);
+    }
+
     TRACE("Program started.");
 
     std::vector<std::thread> _threads;

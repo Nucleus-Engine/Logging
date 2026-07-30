@@ -15,9 +15,17 @@ elif log_level == 'FATAL'
   log_level_define = '5'
 endif
 
+console = get_option('console')
+
+compile_args = ['-DLOG_LEVEL=' + log_level_define]
+
+if (console)
+  compile_args += ['-DCONSOLE=true']
+endif
+
 nucleus_logging_dep = declare_dependency(
   include_directories: include_directories('include'),
-  compile_args: ['-DLOG_LEVEL=' + log_level_define],
+  compile_args: compile_args,
 )
 
 install_headers('include/ErrorLogger.h',

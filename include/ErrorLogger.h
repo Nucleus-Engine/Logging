@@ -46,9 +46,20 @@ class ErrorLogger
      */
     static ErrorLogger& getInstance()
     {
-        static ErrorLogger _instance;
+        static ErrorLogger _instance(s_pendingFilename);
 
         return _instance;
+    }
+
+    /**
+     * @brief Sets the file name to use. Defaults to "output.log". This function is
+     *        nonfunctional after the first use of the ErrorLogger singleton.
+     *
+     * @param filename the filename to use
+     */
+    static void setFilename(const std::string& filename)
+    {
+        s_pendingFilename = std::move(filename);
     }
 
     static void setConsoleOnly() { getInstance().m_canWriteToFile = false; }
@@ -98,32 +109,46 @@ class ErrorLogger
 
   private:
     explicit ErrorLogger(std::string filename = "output.log")
-        : m_filename(std::move(filename)), m_canWriteToFile(false), m_mutex()
+        : m_filename(std::move(filename)), m_mutex()
     {
+#ifndef CONSOLE
+        m_canWriteToFile = true;
         m_file.open(m_filename, std::ios::out);
         if (!m_file)
+        {
             std::cout << "Failed to open " << m_filename << "\n";
+            m_canWriteToFile = false;
+        }
 
-        m_canWriteToFile = true;
-        m_file.close();
+        if (m_file.is_open())
+        {
+            m_file.close();
+        }
+#else /* CONSOLE defined*/
+        m_canWriteToFile = false;
+#endif /* #ifndef CONSOLE */
     }
 
     ~ErrorLogger()
     {
         if (m_file.is_open())
+        {
             m_file.close();
+        }
     }
 
     std::string m_filename; //!< logfile name
     std::fstream m_file;    //!< internal file object
     bool m_canWriteToFile;  //!< true if there has been no issue opening the file, false if there has been
     std::mutex m_mutex;     //!< mutex for thread safety
+
+    static inline std::string s_pendingFilename = "output.log";
 };
 
 } // namespace Nucleus
 
 #define COMMON_ENDING(message)                                                                     \
-    std::string("\t\t") + std::string(message) + ":\t\t" + __FILE__ + "[" +                           \
+    std::string("\t\t") + std::string(message) + ":\t\t" + __FILE__ + "[" +                        \
         std::to_string(__LINE__) + "]"
 
 #if LOG_LEVEL <= 1
@@ -134,10 +159,10 @@ class ErrorLogger
  * @param message must be able to convert to std::string
  */
 #define TRACE(message)                                                                             \
-    {                                                                                              \
+    do {                                                                                           \
         std::string output = "[TRACE]" + COMMON_ENDING(message);                                   \
-        Nucleus::ErrorLogger::getInstance().log(output);                                                \
-    }
+        Nucleus::ErrorLogger::getInstance().log(output);                                           \
+    } while (false)
 #else
 #define TRACE(message) ;
 #endif // LOG_LEVEL <= 1
@@ -149,10 +174,10 @@ class ErrorLogger
  * @param message must be able to convert to std::string
  */
 #define DEBUG(message)                                                                             \
-    {                                                                                              \
+    do {                                                                                           \
         std::string output = "[DEBUG]" + COMMON_ENDING(message);                                   \
-        Nucleus::ErrorLogger::getInstance().log(output);                                                \
-    }
+        Nucleus::ErrorLogger::getInstance().log(output);                                           \
+    } while (false)
 #else
 #define DEBUG(message) ;
 #endif // LOG_LEVEL <= 2
@@ -165,10 +190,10 @@ class ErrorLogger
  * @param message must be able to convert to std::string
  */
 #define WARN(message)                                                                              \
-    {                                                                                              \
+    do {                                                                                           \
         std::string output = "[WARN]" + COMMON_ENDING(message);                                    \
-        Nucleus::ErrorLogger::getInstance().log(output);                                                \
-    }
+        Nucleus::ErrorLogger::getInstance().log(output);                                           \
+    } while (false)
 #else
 #define WARN(message) ;
 #endif // LOG_LEVEL <= 3
@@ -181,10 +206,10 @@ class ErrorLogger
  * @param message must be able to convert to std::string
  */
 #define ERROR(message)                                                                             \
-    {                                                                                              \
+    do {                                                                                           \
         std::string output = "[ERROR]" + COMMON_ENDING(message);                                   \
-        Nucleus::ErrorLogger::getInstance().log(output);                                                \
-    }
+        Nucleus::ErrorLogger::getInstance().log(output);                                           \
+    } while (false)
 #else
 #define ERROR(message) ;
 #endif // LOG_LEVEL <= 4
@@ -195,11 +220,7 @@ class ErrorLogger
  * @param message must be able to convert to std::string
  */
 #define FATAL(message)                                                                             \
-    {                                                                                              \
+    do {                                                                                           \
         std::string output = "[FATAL]" + COMMON_ENDING(message);                                   \
-        Nucleus::ErrorLogger::getInstance().log(output);                                                \
-    }
-
-#ifdef FILE_ONLY
-Nucleus::ErrorLogger::setConsoleOnly();
-#endif
+        Nucleus::ErrorLogger::getInstance().log(output);                                           \
+    } while (false)

@@ -1,1 +1,2 @@
 option('log_level', type: 'combo', choices: ['TRACE', 'DEBUG', 'WARN', 'ERROR', 'FATAL'], value: 'WARN', description: 'Default log level for the logger')
+option('console', type: 'boolean', value: false, description: 'Set to true if console output is desired')
