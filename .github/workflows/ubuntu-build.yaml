@@ -1,0 +1,44 @@
+name: Build, Run, and Verify Logger Example
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y meson ninja-build g++ python3
+
+      - name: Configure project with Meson
+        # Adjust log_level here if you want a non-default build config,
+        # e.g. -Dlog_level=ERROR
+        run: meson setup build
+
+      - name: Build project
+        run: meson compile -C build
+
+      - name: Run the example
+        # Assumes the compiled executable lands at build/examples/logger_example
+        # (i.e. examples/meson.build's executable() is named 'logger_example').
+        # Adjust the path if your build output directory differs.
+        working-directory: build/examples
+        run: ./logger_example
+
+      - name: Locate output.log
+        # ErrorLogger writes output.log relative to the process's working
+        # directory (build/examples, per the run step above). Copy it to the
+        # repo root so the verification script's default LOG_PATH finds it.
+        run: cp build/examples/output.log output.log
+
+      - name: Run verification script
+        run: python3 scripts/example_verification.py

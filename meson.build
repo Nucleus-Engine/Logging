@@ -15,14 +15,7 @@ elif log_level == 'FATAL'
   log_level_define = '5'
 endif
 
-logger_lib = library('NucleusLogging',
-  include_directories: include_directories('../include'),
-  cpp_args: ['-DLOG_LEVEL=' + log_level_define],
-  install: true
-)
-
 nucleus_logging_dep = declare_dependency(
-  link_with: logger_lib,
   include_directories: include_directories('include'),
   compile_args: ['-DLOG_LEVEL=' + log_level_define],
 )

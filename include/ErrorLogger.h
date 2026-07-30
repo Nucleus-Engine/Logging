@@ -6,6 +6,19 @@
 #include <iostream>
 #include <string>
 #include <utility>
+#include <mutex>
+
+inline std::tm get_local_time(const std::time_t& timer) {
+    std::tm bt{};
+#if defined(_MSC_VER) || defined(__MINGW32__)
+    // Windows implementation (arguments reversed from POSIX)
+    localtime_s(&bt, &timer);
+#else
+    // POSIX implementation (Linux, macOS)
+    localtime_r(&timer, &bt);
+#endif
+    return bt;
+}
 
 /**
  * LOG_LEVELS
@@ -52,10 +65,15 @@ class ErrorLogger
         const std::time_t now = std::chrono::system_clock::to_time_t(currentTime);
 
         char timeBuffer[80];
-        std::strftime(timeBuffer, sizeof(timeBuffer), "%c", localtime(&now));
+        {
+            std::tm tmBuf = get_local_time(now);
+            std::strftime(timeBuffer, sizeof(timeBuffer), "%c", &tmBuf);
+        }
 
         std::string output(timeBuffer);
         output.append("\t" + logString + "\n");
+
+        std::lock_guard<std::mutex> lock(m_mutex);
 
         if (!m_canWriteToFile)
         {
@@ -64,7 +82,6 @@ class ErrorLogger
         }
 
         m_file.open(m_filename, std::ios::app);
-
         if (!m_file)
         {
             std::cout << output;
@@ -81,7 +98,7 @@ class ErrorLogger
 
   private:
     explicit ErrorLogger(std::string filename = "output.log")
-        : m_filename(std::move(filename)), m_canWriteToFile(false)
+        : m_filename(std::move(filename)), m_canWriteToFile(false), m_mutex()
     {
         m_file.open(m_filename, std::ios::out);
         if (!m_file)
@@ -99,14 +116,14 @@ class ErrorLogger
 
     std::string m_filename; //!< logfile name
     std::fstream m_file;    //!< internal file object
-    bool m_canWriteToFile;  //!< true if there has been no issue opening the
-    //!< file, false if there has been
+    bool m_canWriteToFile;  //!< true if there has been no issue opening the file, false if there has been
+    std::mutex m_mutex;     //!< mutex for thread safety
 };
 
-} // namespace kn
+} // namespace Nucleus
 
 #define COMMON_ENDING(message)                                                                     \
-    std::string("\t\t") + std::string(message) + ": " + __FILE__ + "[" +                           \
+    std::string("\t\t") + std::string(message) + ":\t\t" + __FILE__ + "[" +                           \
         std::to_string(__LINE__) + "]"
 
 #if LOG_LEVEL <= 1
