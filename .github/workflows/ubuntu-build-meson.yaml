@@ -1,4 +1,4 @@
-name: Build, Run, and Verify Logger Example
+name: Build, Run, and Verify Logger Example (Meson)
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  build-and-verify:
+  build-example-meson:
     runs-on: ubuntu-latest
     strategy:
       matrix:

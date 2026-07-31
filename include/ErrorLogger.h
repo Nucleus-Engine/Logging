@@ -59,7 +59,7 @@ class ErrorLogger
      */
     static void setFilename(const std::string& filename)
     {
-        s_pendingFilename = std::move(filename);
+        s_pendingFilename = filename;
     }
 
     static void setConsoleOnly() { getInstance().m_canWriteToFile = false; }

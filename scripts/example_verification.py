@@ -111,7 +111,7 @@ def main() -> int:
         print(f"FAIL: expected {EXPECTED_COUNT} ERROR lines, found {len(error_indices)}")
 
     if ok:
-        print(f"OK: {len(error_indices)} ERROR lines + 1 TRACE line, all well-formed, "
+        print(f"OK: {len(error_indices)} ERROR lines + {len(trace_lines)} TRACE line(s), all well-formed, "
               "no duplicates, no gaps.")
         return 0
 
