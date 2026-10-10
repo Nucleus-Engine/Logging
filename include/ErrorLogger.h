@@ -62,7 +62,12 @@ class ErrorLogger
         s_pendingFilename = filename;
     }
 
-    static void setConsoleOnly() { getInstance().m_canWriteToFile = false; }
+    static void setConsoleOnly()
+    {
+        ErrorLogger& logger = getInstance();
+        std::lock_guard<std::mutex> lock(logger.m_mutex);
+        logger.m_canWriteToFile = false;
+    }
 
     /**
      * @brief logs the given string with a timestamp that looks like "Mon Nov 20

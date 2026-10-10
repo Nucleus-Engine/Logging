@@ -39,6 +39,6 @@ if(CONSOLE)
 endif()
 
 install(FILES include/ErrorLogger.h
-        DESTINATION include/NucleusLogging)
+        DESTINATION include)
 
 add_subdirectory(examples)
